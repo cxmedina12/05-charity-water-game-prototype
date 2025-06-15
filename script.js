@@ -293,10 +293,10 @@ function startWhackAMoleWater() {
 function handleWaterClick(box, boxes) {
   // Prevent clicking if the game is over
   if (startBtn.disabled === false) return;
-  updateScore(10);
+  updateScore(10); // Add points
   box.textContent = "";
-  waterSound.play();
-  box.style.backgroundColor = "#b3e6ff";
+  waterSound.play(); // Play sound for feedback
+  box.style.backgroundColor = "#b3e6ff"; // Visual feedback: blue flash
   setTimeout(() => {
     box.style.backgroundColor = "";
   }, 300);
@@ -325,16 +325,16 @@ function handleObstacleClick(obstacle, box, boxes) {
   // Prevent clicking if the game is over
   if (startBtn.disabled === false) return;
   if (obstacle === "🚧") {
-    updateScore(-5);
+    updateScore(-5); // Subtract points
     box.textContent = "";
-    buzzSound.play();
-    lives--;
-    updateLivesDisplay();
-    box.style.backgroundColor = "#ffcccc";
+    buzzSound.play(); // Play buzz sound
+    box.style.backgroundColor = "#ffcccc"; // Visual feedback: red flash
     setTimeout(() => {
       box.style.backgroundColor = "";
     }, 300);
     showEncouragement();
+    lives--;
+    updateLivesDisplay();
     if (lives <= 0) {
       clearTimeout(levelTimer);
       clearInterval(interval);
@@ -342,7 +342,7 @@ function handleObstacleClick(obstacle, box, boxes) {
       return;
     }
   } else if (obstacle === "🪣") {
-    updateScore(-8);
+    updateScore(-8); // This line reduces the player's score by 8 points
     box.textContent = "";
     buzzSound.play();
     box.style.backgroundColor = "#ffe0b3";
@@ -356,7 +356,7 @@ function handleObstacleClick(obstacle, box, boxes) {
 // Update the score display in real-time
 function updateScore(amount) {
   score += amount;
-  scoreDisplay.textContent = score;
+  scoreDisplay.textContent = score; // This updates the score on the screen right away
 }
 
 // Update the strikes display in real-time
@@ -393,7 +393,47 @@ function startTimer() {
   }, 1000);
 }
 
-// End the game and show the final message
+// Function to show a simple confetti effect when the player wins
+function showConfetti() {
+  // Create a container for confetti
+  const confettiContainer = document.createElement('div');
+  confettiContainer.style.position = 'fixed';
+  confettiContainer.style.top = '0';
+  confettiContainer.style.left = '0';
+  confettiContainer.style.width = '100vw';
+  confettiContainer.style.height = '100vh';
+  confettiContainer.style.pointerEvents = 'none';
+  confettiContainer.style.zIndex = '2000';
+
+  // Add 40 confetti pieces using emoji
+  for (let i = 0; i < 40; i++) {
+    const confetti = document.createElement('div');
+    const confettiEmojis = ['🎉', '✨', '💧', '🎊', '⭐'];
+    confetti.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+    confetti.style.position = 'absolute';
+    confetti.style.left = `${Math.random() * 100}vw`;
+    confetti.style.top = `${-10 + Math.random() * 10}vh`;
+    confetti.style.fontSize = `${1 + Math.random() * 1.5}rem`;
+    confetti.style.opacity = '0.85';
+    confetti.style.transition = 'top 1.5s linear, opacity 1.5s linear';
+    confettiContainer.appendChild(confetti);
+
+    // Animate confetti falling
+    setTimeout(() => {
+      confetti.style.top = `${70 + Math.random() * 25}vh`;
+      confetti.style.opacity = '0';
+    }, 50);
+  }
+
+  document.body.appendChild(confettiContainer);
+
+  // Remove confetti after 1.7 seconds
+  setTimeout(() => {
+    confettiContainer.remove();
+  }, 1700);
+}
+
+// Update the endGame function to show confetti when the player wins
 function endGame(won) {
   // Stop timers
   clearInterval(interval);
@@ -404,6 +444,7 @@ function endGame(won) {
 
   // Show win or lose message
   if (won) {
+    showConfetti(); // Show confetti effect
     encouragementDiv.textContent = "Congratulations! You helped all villagers!";
   } else {
     encouragementDiv.textContent = "Game Over! Try again to help the villagers!";
